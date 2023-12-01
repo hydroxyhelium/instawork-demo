@@ -9,4 +9,4 @@ Here are the things left to do :-
 - [ ] Set up the mongoDB cluster
 - [ ] Make a Login/Signup Page 
 - [ ] Make the Login/SignUp controller
-- [] Set up a MongoDB cluster
+- [ ] Set up a MongoDB cluster
