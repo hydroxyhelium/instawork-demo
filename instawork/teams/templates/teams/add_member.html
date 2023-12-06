@@ -1,0 +1,14 @@
+<html>
+<head>
+    <title>Add Member</title>
+</head>
+<body>
+    <h1>Add Member to Your Team</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Member</button>
+    </form>
+</body>
+</html>

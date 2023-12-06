@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>Your Teams</title>
+</head>
+<body>
+    <h1>Your Team Members</h1>
+    
+    {% if team_members %}
+        <ul>
+            {% for member in team_members %}
+                <li>{{ member.admin }}</li>
+                <li>{{ member.first_name }}</li>
+                <li>{{ member.last_name }}</li>
+                <li>{{ member.email_id }}</li>
+                <li>{{ member.phone_number }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No team members found.</p>
+    {% endif %}
+
+    <a href="{% url 'teams:add_member' %}"><button>Add Member</button></a>
+</body>
+</html>

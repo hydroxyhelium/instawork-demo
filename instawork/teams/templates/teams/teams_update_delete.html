@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update/Delete</title>
+</head>
+<body>
+
+  <h2>Update or Delete</h2>
+
+  {% if object %}
+    <form method="post" action="{% url 'teams:teamprofile_update' pk=object.pk %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Update</button>
+    </form>
+
+    <form method="post" action="{% url 'teams:teamprofile_delete' pk=object.pk %}">
+      {% csrf_token %}
+      <button type="submit">Delete</button>
+    </form>
+  {% else %}
+    <p>No object found.</p>
+  {% endif %}
+
+</body>
+</html>
