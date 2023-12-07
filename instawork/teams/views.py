@@ -9,7 +9,10 @@ import random
 from django.views.generic import UpdateView, DeleteView
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-from .utils import handle_admin_create, create_temp_user, handle_nonadmin_create
+from django.db import transaction
+
+
+from .utils import handle_admin_create,handle_nonadmin_create
 
 def generate_random_number_based_on_timestamp():
     timestamp = int(time.time())
@@ -23,13 +26,15 @@ def generate_random_number_based_on_timestamp():
 def home(request):
     print(request.user.is_authenticated)
     print(request.user.email)
+    team_members = []
 
-    user_profile = UserProfile.objects.get(email=request.user.email)
-    team_id = user_profile.team_id
-
-    print(team_id)
-
-    team_members = TeamProfile.objects.filter(team_id=team_id).exclude(email_id=request.user.email)
+    with transaction.atomic():
+        try:
+            user_team_profile = TeamProfile.objects.select_for_update().get(email_id=request.user.email)
+            # Retrieve other team members with the same team_id
+            team_members = TeamProfile.objects.select_for_update().filter(team_id=user_team_profile.team_id).exclude(email_id=request.user.email)
+        except Exception as e:
+            pass 
 
     return render(request, 'teams/list_view.html', {'team_members': team_members})
 
@@ -39,10 +44,9 @@ def add_member(request):
         
         form = AddMemberForm(request.POST)
         user = UserProfile.objects.get(email=request.user.email)
-        add_og = False
+
         if(user.team_id == -1):
             team_id = generate_random_number_based_on_timestamp()
-            add_og = True
         else:
             team_id = user.team_id
 
@@ -52,14 +56,14 @@ def add_member(request):
 
             UserProfile.objects.filter(**filter_condition_1).update(**update_values)
             user = UserProfile.objects.get(email=request.user.email)
-            role = form.cleaned_data['role']
+            role = form.cleaned_data['admin']
             
-            if(role == 'admin' and user.admin):
+            if(role and user.admin):
                 member = form.save(commit=False)
                 handle_admin_create(request, member, team_id)
                 return redirect('teams:home')
 
-            elif(role == 'non_admin'):
+            elif(not role):
                 member = form.save(commit=False)
                 handle_nonadmin_create(request, member, team_id)
 
@@ -121,7 +125,7 @@ class teamprofile_delete(UserPassesTestMixin, DeleteView):
         if(not self.request.user.is_authenticated):
             return False
         existing_profiles = TeamProfile.objects.filter(email_id=self.request.user.email)[0]
-        if(existing_profiles.admin):
+        if(not existing_profiles.admin):
             return False
         return True
 

@@ -13,6 +13,7 @@
                 <li>{{ member.last_name }}</li>
                 <li>{{ member.email_id }}</li>
                 <li>{{ member.phone_number }}</li>
+                <li><a href="{% url 'teams:teamprofile_update' pk=member.id %}">Update/Delete</a></li>
             {% endfor %}
         </ul>
     {% else %}
