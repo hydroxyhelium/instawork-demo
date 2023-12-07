@@ -1,0 +1,68 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1em;
+}
+
+h1 {
+    color: #333;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+li {
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    text-align: left;
+    width: 250px;
+    position: relative;
+    /* Add position:relative to make room for absolute positioning */
+}
+
+img {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    /* Adjust the width as needed */
+    height: 40px;
+    /* Adjust the height as needed */
+    border-radius: 50%;
+    /* Make the image circular */
+}
+
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

@@ -1,25 +1,46 @@
-<html>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'teams/list_view.css' %}">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Teams</title>
 </head>
+
 <body>
-    <h1>Your Team Members</h1>
-    
-    {% if team_members %}
+    <header>
+        <h1>Your Team Members</h1>
+    </header>
+
+    <main>
+        {% if team_members %}
+        <p>You have {{ team_members|length }} team members.</p>
         <ul>
             {% for member in team_members %}
-                <li>{{ member.admin }}</li>
-                <li>{{ member.first_name }}</li>
-                <li>{{ member.last_name }}</li>
-                <li>{{ member.email_id }}</li>
-                <li>{{ member.phone_number }}</li>
-                <li><a href="{% url 'teams:teamprofile_update' pk=member.id %}">Update/Delete</a></li>
+            <li>
+                <img src="{% static 'teams/user_icon.jpeg' %}" alt="User Icon">
+                <strong>Admin:</strong> {{ member.admin }}<br>
+                <strong>First Name:</strong> {{ member.first_name }}<br>
+                <strong>Last Name:</strong> {{ member.last_name }}<br>
+                <strong>Email:</strong> {{ member.email_id }}<br>
+                <strong>Phone Number:</strong> {{ member.phone_number }}<br>
+                <button onclick="redirectToProfile('{{ member.id }}')">Update/Delete</button>
+            </li>
             {% endfor %}
         </ul>
-    {% else %}
+        {% else %}
         <p>No team members found.</p>
-    {% endif %}
+        {% endif %}
 
-    <a href="{% url 'teams:add_member' %}"><button>Add Member</button></a>
+        <a href="{% url 'teams:add_member' %}">
+            <button>Add Member</button>
+        </a>
+    </main>
+
+    <script>
+        function redirectToProfile(userId) {
+            // Redirect to the user profile page
+            window.location.href = `/teams/${userId}/update`;
+        }
+    </script>
 </body>
-</html>

@@ -24,8 +24,6 @@ def generate_random_number_based_on_timestamp():
 
 @login_required(login_url="login/")
 def home(request):
-    print(request.user.is_authenticated)
-    print(request.user.email)
     team_members = []
 
     with transaction.atomic():
@@ -128,9 +126,6 @@ class teamprofile_delete(UserPassesTestMixin, DeleteView):
         if(not existing_profiles.admin):
             return False
         return True
-
-
-
 
 def login_view(request):
     if request.method == 'POST':
