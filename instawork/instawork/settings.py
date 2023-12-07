@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'teams.apps.TeamsConfig',
-    'polls.apps.PollsConfig',
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
