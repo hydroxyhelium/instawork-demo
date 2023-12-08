@@ -23,7 +23,7 @@
                 <strong>First Name:</strong> {{ member.first_name }}<br>
                 <strong>Last Name:</strong> {{ member.last_name }}<br>
                 <strong>Email:</strong> {{ member.email_id }}<br>
-                <strong>Phone Number:</strong> {{ member.phone_number }}<br>
+                <strong>Phone Number:</strong> {{ member.phone_number|slice:"0:3" }}-{{ member.phone_number|slice:"3:6" }}-{{ member.phone_number|slice:"6:10" }}<br>
                 <button onclick="redirectToProfile('{{ member.id }}')">Update/Delete</button>
             </li>
             {% endfor %}

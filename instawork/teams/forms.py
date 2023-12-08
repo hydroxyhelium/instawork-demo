@@ -5,13 +5,6 @@ from .models import UserProfile, TeamProfile
 
 
 class AddMemberForm(ModelForm):
-    # ROLE_CHOICES = (
-    #     ('admin', 'Admin'),
-    #     ('non_admin', 'Non-Admin'),
-    # )
-
-    # role = forms.ChoiceField(choices=ROLE_CHOICES)
-
     class Meta:
         model = TeamProfile
         fields = ["first_name", "last_name","email_id", "phone_number", "admin"]
@@ -25,7 +18,6 @@ class AddMemberForm(ModelForm):
 
 
 class SignUpForm(UserCreationForm):
-    # Customize fields if needed
     class Meta:
         model = UserProfile
         fields = ['username', 'first_name', 'last_name', 'email', 'phone_number']

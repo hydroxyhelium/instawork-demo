@@ -15,6 +15,11 @@ from django.db import transaction
 from .utils import handle_admin_create,handle_nonadmin_create
 
 def generate_random_number_based_on_timestamp():
+    """Generates a random number based on the current timestamp.
+
+    Returns:
+        An integer representing the random number generated.
+    """
     timestamp = int(time.time())
     random_component = random.randint(1, 1000)
     result = int(f"{timestamp}{random_component}")
@@ -24,39 +29,63 @@ def generate_random_number_based_on_timestamp():
 
 @login_required(login_url="login/")
 def home(request):
+    """Renders the home page for a team.
+    Retrieves the team ID of the logged-in user and displays a list of other team members with the same team ID.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        A rendered HTML template that displays a list of team members.
+    """
     team_members = []
 
     with transaction.atomic():
         try:
             user_team_profile = TeamProfile.objects.select_for_update().get(email_id=request.user.email)
+            print(user_team_profile.team_id)
             # Retrieve other team members with the same team_id
             team_members = TeamProfile.objects.select_for_update().filter(team_id=user_team_profile.team_id).exclude(email_id=request.user.email)
         except Exception as e:
+            print(e)
             pass 
 
     return render(request, 'teams/list_view.html', {'team_members': team_members})
 
 @login_required(login_url="login/")
 def add_member(request):
+    """
+    Add a team member to the user's team with optional admin privileges.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Redirects to the home page upon successful addition; otherwise, displays error messages or templates.
+    """
     if request.method == 'POST':
         
         form = AddMemberForm(request.POST)
-        user = UserProfile.objects.get(email=request.user.email)
+        team_id = -1
+        user_admin = True
 
-        if(user.team_id == -1):
+        with transaction.atomic():
+            try:
+                user_team_profile = TeamProfile.objects.select_for_update().get(email_id=request.user.email)
+                # Retrieve other team members with the same team_id
+                team_id = user_team_profile.team_id
+                user_admin = user_team_profile.admin
+            except Exception as e:
+                print(e)
+                pass 
+
+        if(team_id == -1):
             team_id = generate_random_number_based_on_timestamp()
-        else:
-            team_id = user.team_id
 
         if form.is_valid():
-            filter_condition_1 = {"email":request.user.email, "team_id":-1}
-            update_values = {"admin":True}
-
-            UserProfile.objects.filter(**filter_condition_1).update(**update_values)
-            user = UserProfile.objects.get(email=request.user.email)
             role = form.cleaned_data['admin']
             
-            if(role and user.admin):
+            if(role and user_admin):
                 member = form.save(commit=False)
                 handle_admin_create(request, member, team_id)
                 return redirect('teams:home')
@@ -75,8 +104,17 @@ def add_member(request):
 
     return render(request, 'teams/add_member.html', {'form': form})
 
-# @login_required(login_url="login/")
 class teamprofile_update(UserPassesTestMixin, UpdateView):
+    """
+    UpdateView for modifying TeamProfile.
+
+    Args:
+        - UserPassesTestMixin: Mixin to check if the user passes the test_func before allowing access.
+        - UpdateView: Django's generic view for handling updating of an object.
+
+    Returns:
+        Redirects to the home page upon successful update;
+    """
     model = TeamProfile
     template_name = 'teams/teams_update_delete.html'
     form_class = AddMemberForm
@@ -109,9 +147,18 @@ class teamprofile_update(UserPassesTestMixin, UpdateView):
         kwargs = super(teamprofile_update, self).get_form_kwargs()
         kwargs['instance'] = self.get_object()  # Pass the instance to the form
         return kwargs
-    
-# @login_required(login_url="login/")
+
 class teamprofile_delete(UserPassesTestMixin, DeleteView):
+    """
+    DeleteView subclass for deleting a TeamProfile instance.
+
+    Args:
+        - UserPassesTestMixin: Mixin to check if the user passes the test_func before allowing access.
+        - DeleteView: Django's generic view for handling deletion of an object.
+
+    Returns:
+        - URL to redirect to upon successful deletion, pointing to the 'teams:home' route.
+    """
     model = TeamProfile
     template_name = 'teams/teams_update_delete.html'
 
@@ -128,6 +175,16 @@ class teamprofile_delete(UserPassesTestMixin, DeleteView):
         return True
 
 def login_view(request):
+    """
+    Handles user authentication and login.
+
+    Args:
+        - request: The HTTP request object.
+
+    Returns:
+        - If the request method is POST and the submitted form is valid, authenticates the user and redirects to 'teams:home'.
+        - If the request method is GET, renders the login form.
+    """
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
@@ -142,6 +199,16 @@ def login_view(request):
     return render(request, 'teams/login.html', {'form': form})
 
 def signup_view(request):
+    """
+    Handles user registration and signup.
+
+    Args:
+        - request: The HTTP request object.
+
+    Returns:
+        - If the request method is POST and the submitted signup form is valid, creates a new user, logs them in, and redirects to 'teams:home'.
+        - If the request method is GET, renders the signup form.
+    """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
