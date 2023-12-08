@@ -10,8 +10,6 @@ from django.views.generic import UpdateView, DeleteView
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 from django.db import transaction
-
-
 from .utils import handle_admin_create,handle_nonadmin_create
 
 def generate_random_number_based_on_timestamp():
@@ -44,8 +42,10 @@ def home(request):
         try:
             user_team_profile = TeamProfile.objects.select_for_update().get(email_id=request.user.email)
             print(user_team_profile.team_id)
-            # Retrieve other team members with the same team_id
-            team_members = TeamProfile.objects.select_for_update().filter(team_id=user_team_profile.team_id).exclude(email_id=request.user.email)
+            if(user_team_profile.team_id != -1):
+                team_members = TeamProfile.objects.select_for_update().filter(team_id=user_team_profile.team_id)
+            else:
+                team_members = [user_team_profile]
         except Exception as e:
             print(e)
             pass 
@@ -125,6 +125,10 @@ class teamprofile_update(UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         existing_profiles = TeamProfile.objects.filter(email_id=self.request.user.email)[0]
         if((not existing_profiles.admin) and (form.cleaned_data['admin'])):
+            ## non-admin user trying to upgrade privilage
+            return self.form_invalid(form)
+        if((not existing_profiles.admin) and (self.get_object().admin) and (not form.cleaned_data['admin'])):
+            ## non-admin user trying to downgrade privilage
             return self.form_invalid(form)
         
         return super().form_valid(form)
@@ -213,6 +217,10 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
+
+            update_values_original = {"team_id": -1, "first_name":user.first_name, "last_name":user.last_name, 
+    "email_id": user.email, "phone_number": user.phone_number, "admin": True}
+            obj, created = TeamProfile.objects.get_or_create(defaults=update_values_original, **{"email_id": user.email})
             login(request, user)
             return redirect('teams:home')
     else:

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Teams</title>
+    <title id="heading">Your Teams</title>
 </head>
 
 <body>
@@ -14,7 +14,7 @@
 
     <main>
         {% if team_members %}
-        <p>You have {{ team_members|length }} team members.</p>
+        <p>You have {{ team_members|length|add:"-1"  }} team members.</p>
         <ul>
             {% for member in team_members %}
             <li>

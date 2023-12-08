@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update/Delete</title>
 </head>
+<header>
+  <h1>Update or Delete</h1>
+</header>
 <body>
-
-  <h2>Update or Delete</h2>
-
   {% if object %}
     <form method="post" action="{% url 'teams:teamprofile_update' pk=object.pk %}">
       {% csrf_token %}

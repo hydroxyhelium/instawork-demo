@@ -1,5 +1,6 @@
 from .models import UserProfile, TeamProfile
 from django.db.models import F
+from django.db import transaction
 
 
 def handle_admin_create(request, member,team_id):
@@ -42,9 +43,9 @@ def model_update(request, member,team_id, admin):
 
     TeamProfile.objects.create(**update_values_new_user)
 
-    update_values_original = {"team_id": team_id, "first_name":request.user.first_name, "last_name":request.user.last_name, 
-    "email_id": request.user.email, "phone_number": request.user.phone_number, "admin": request.user.admin}
-    obj, created = TeamProfile.objects.get_or_create(defaults=update_values_original, **{"email_id": request.user.email})
-    
-    if(not created):
-        obj.save()
+    try:
+        with transaction.atomic():
+                objects_to_update = TeamProfile.objects.filter(**{"email_id":request.user.email})
+                objects_to_update.update(**{"team_id":team_id})
+    except Exception as e:
+        pass 

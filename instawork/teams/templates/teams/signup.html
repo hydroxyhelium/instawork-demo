@@ -1,6 +1,8 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'teams/list_view.css' %}">
-<h2>Sign Up</h2>
+<header>
+    <h1>Sign Up</h1>
+</header>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
