@@ -1,2 +1,4 @@
 myvenv
 .env
+instawork/db.sqlite3
+

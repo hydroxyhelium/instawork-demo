@@ -1,12 +1,32 @@
-Here are the things left to do :- 
+# Instaork demo application README
+
+## Getting Started
+
+### Prerequisites
+
+set up the local environment using the requirements.txt file
+
+```
+pip3 install -r instawork/requirements.txt
+```
+
+apply migrations using
+
+```
+python3 manage.py migrate
+```
+
+run server at local host 8000 using
+
+```
+python3 manage.py runserver
+```
+
+Alternatively you can run the setup.sh script that I created, which does all the above mentioned things
+
+```
+chmod a+x setup.sh
+./setup.sh
+```
 
 
-## Things to do (more things need to be added here)
-
-- [x] Make a System Context Diagram 
-- [x] Make Component Diagram
-- [ ] Make a blank Django Boiler plate template
-- [ ] Set up the mongoDB cluster
-- [ ] Make a Login/Signup Page 
-- [ ] Make the Login/SignUp controller
-- [ ] Set up a MongoDB cluster
