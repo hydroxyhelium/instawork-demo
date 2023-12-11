@@ -11,6 +11,8 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 from django.db import transaction
 from .utils import handle_admin_create,handle_nonadmin_create
+from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 
 def generate_random_number_based_on_timestamp():
     """Generates a random number based on the current timestamp.
@@ -84,7 +86,6 @@ def add_member(request):
 
         if form.is_valid():
             role = form.cleaned_data['admin']
-            
             if(role and user_admin):
                 member = form.save(commit=False)
                 handle_admin_create(request, member, team_id)
@@ -123,14 +124,25 @@ class teamprofile_update(UserPassesTestMixin, UpdateView):
         return redirect("teams:home").url
 
     def form_valid(self, form):
-        existing_profiles = TeamProfile.objects.filter(email_id=self.request.user.email)[0]
-        if((not existing_profiles.admin) and (form.cleaned_data['admin'])):
-            ## non-admin user trying to upgrade privilage
+        existing_profiles = TeamProfile.objects.filter(email_id=self.request.user.email).first()
+        query_set = TeamProfile.objects.filter(email_id=form.cleaned_data['email_id'])
+
+        if query_set.exists() and query_set[0].team_id != -1:
+            # You are not allowed to add members from other teams
+            messages.error(self.request, "Operation failed: You cannot add members from other teams.")
             return self.form_invalid(form)
-        if((not existing_profiles.admin) and (self.get_object().admin) and (not form.cleaned_data['admin'])):
-            ## non-admin user trying to downgrade privilage
+
+        if not existing_profiles.admin and form.cleaned_data['admin']:
+            # Non-admin user trying to upgrade privilege
+            messages.error(self.request, "Operation failed: Non-admin users cannot upgrade privileges.")
             return self.form_invalid(form)
-        
+
+        if not existing_profiles.admin and self.get_object().admin and not form.cleaned_data['admin']:
+            # Non-admin user trying to downgrade privilege
+            messages.error(self.request, "Operation failed: Non-admin users cannot downgrade privileges.")
+            return self.form_invalid(form)
+
+        messages.success(self.request, "Operation successful: Form submitted successfully.")
         return super().form_valid(form)
 
     def test_func(self):
@@ -146,6 +158,9 @@ class teamprofile_update(UserPassesTestMixin, UpdateView):
             return False
         
         return True
+    
+    def handle_no_permission(self):
+        raise PermissionDenied("You don't have the right permission or the member assigned to some other team.")
     
     def get_form_kwargs(self):
         kwargs = super(teamprofile_update, self).get_form_kwargs()

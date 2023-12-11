@@ -35,13 +35,14 @@ def model_update(request, member,team_id, admin):
     filter_condition_1 = {"email_id":member.email_id}
     query_set = TeamProfile.objects.filter(**filter_condition_1)
 
-    if query_set.exists():
+    if query_set.exists() and query_set[0].team_id != -1:
         raise ValueError("error forbidden")
 
     update_values_new_user = {"admin":admin, "team_id": team_id, "first_name":member.first_name, "last_name":member.last_name, 
     "email_id": member.email_id, "phone_number": member.phone_number}
 
-    TeamProfile.objects.create(**update_values_new_user)
+    TeamProfile.objects.update_or_create(
+    email_id=member.email_id, defaults=update_values_new_user)
 
     try:
         with transaction.atomic():

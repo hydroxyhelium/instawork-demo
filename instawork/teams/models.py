@@ -9,12 +9,12 @@ class TeamProfile(models.Model):
     admin = models.BooleanField(default=False)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
-    email_id = models.EmailField(unique=True)
+    email_id = models.EmailField()
     phone_regex = RegexValidator(regex=r'^\d{10}$', message="Phone number must be exactly 10 digits")
     phone_number = models.CharField(validators=[phone_regex], max_length=10)
 
     def __str__(self):
-        return "{team_id} {first_name} {last_name} {admin} {email_id}"
+        return "{self.team_id} {self.first_name} {self.last_name} {self.admin} {self.email_id}"
 
 class UserProfile(AbstractUser):
     email = models.EmailField(primary_key=True)
@@ -22,7 +22,7 @@ class UserProfile(AbstractUser):
     team_id = models.IntegerField(default=-1)
     phone_number = models.CharField(max_length=13)
     phone_regex = RegexValidator(regex=r'^\d{10}$', message="Phone number must be exactly 10 digits")
-    phone_number = models.CharField(validators=[phone_regex], max_length=10)
+    phone_number = models.CharField(validators=[phone_regex], max_length=10, unique=True)
 
     def __str__(self):
-        return "{team_id} {email}"
+        return "{self.team_id} {self.email}"

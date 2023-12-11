@@ -16,6 +16,11 @@ class AddMemberForm(ModelForm):
             "admin": "Admin",
         }
 
+    def is_valid(self):
+        # Skip validation for my_field
+        self.fields['email_id'].required = False
+        return super().is_valid()
+
 
 class SignUpForm(UserCreationForm):
     class Meta:
@@ -28,6 +33,16 @@ class SignUpForm(UserCreationForm):
             'last_name': 'Last Name', 
             'phone_number': 'Phone Number', 
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Set sample field values as placeholders
+        self.fields['username'].widget.attrs['placeholder'] = 'e.g., john_doe'
+        self.fields['first_name'].widget.attrs['placeholder'] = 'e.g., John'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'e.g., Doe'
+        self.fields['email'].widget.attrs['placeholder'] = 'e.g., john@example.com'
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'e.g., 1234567890'
 
 class LoginForm(AuthenticationForm):
     pass
