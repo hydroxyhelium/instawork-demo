@@ -127,20 +127,17 @@ class teamprofile_update(UserPassesTestMixin, UpdateView):
         existing_profiles = TeamProfile.objects.filter(email_id=self.request.user.email).first()
         query_set = TeamProfile.objects.filter(email_id=form.cleaned_data['email_id'])
 
-        if query_set.exists() and not(query_set[0].email_id == self.get_object().email_id) and not(query_set[0].team_id == -1):
-            # You are not allowed to add members from other teams
-            # messages.error(self.request, "Operation failed: You cannot add members from other teams.")
-            print(self.get_object().email_id)
-            return self.form_invalid(form)
+        mod = False
 
-        if not existing_profiles.admin and form.cleaned_data['admin']:
+        if(query_set.exists()):
+            mod = query_set[0].admin == form.cleaned_data['admin']
+
+        if not existing_profiles.admin and query_set.exists() and not mod:
             # Non-admin user trying to upgrade privilege
             # messages.error(self.request, "Operation failed: Non-admin users cannot upgrade privileges.")
             return self.form_invalid(form)
-
-        if not existing_profiles.admin and self.get_object().admin and not form.cleaned_data['admin']:
-            # Non-admin user trying to downgrade privilege
-            # messages.error(self.request, "Operation failed: Non-admin users cannot downgrade privileges.")
+        
+        if(not existing_profiles.admin and not query_set.exists() and form.cleaned_data['admin']):
             return self.form_invalid(form)
 
         messages.success(self.request, "Operation successful: Form submitted successfully.")
