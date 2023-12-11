@@ -45,3 +45,5 @@ chmod a+x setup.sh
 
 You can go to sign up page using http://localhost:8000/teams/ or http://localhost:8000/teams/signup and
 login using http://localhost:8000/teams/login
+
+## admin user however can make another user admin
