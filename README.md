@@ -40,3 +40,8 @@ source myvenv/bin/activate
 chmod a+x setup.sh
 ./setup.sh
 ```
+
+## Testing
+
+You can go to sign up page using http://localhost:8000/teams/ or http://localhost:8000/teams/signup and
+login using http://localhost:8000/teams/login
