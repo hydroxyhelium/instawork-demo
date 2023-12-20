@@ -45,5 +45,3 @@ chmod a+x setup.sh
 
 You can go to sign up page using http://localhost:8000/teams/ or http://localhost:8000/teams/signup and
 login using http://localhost:8000/teams/login
-
-## note that we can update information, but si
