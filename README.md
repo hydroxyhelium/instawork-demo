@@ -1,4 +1,4 @@
-# Instaork demo application README
+# Instawork demo application README
 
 ## Getting Started
 
@@ -45,3 +45,10 @@ chmod a+x setup.sh
 
 You can go to sign up page using http://localhost:8000/teams/ or http://localhost:8000/teams/signup and
 login using http://localhost:8000/teams/login
+
+## Screenshots
+
+![alt text](screenshot_1.png "Etherscan Screenshot")
+![alt text](screenshot_2.png "Etherscan Screenshot")
+![alt text](screenshot_3.png "Etherscan Screenshot")
+![alt text](screenshot_4.png "Etherscan Screenshot")
